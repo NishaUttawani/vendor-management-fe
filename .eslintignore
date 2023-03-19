@@ -1,0 +1,5 @@
+# test files
+src/*.test.js
+
+# dependencies
+/node_modules
