@@ -17,9 +17,9 @@ export const setUserSession = (token) => {
 export const getBaseUrl = () => {
   let url = '';
   if(process.env.NODE_ENV === 'development') {
-    url = 'http://localhost:1337/api'
+    url = `${process.env.REACT_APP_BASE_URL}/api`
   } else if(process.env.NODE_ENV === 'production') {
-    url = 'http://localhost:1337/api'
+    url = `${process.env.REACT_APP_BASE_URL}/api`
   }
   return url;
 }
