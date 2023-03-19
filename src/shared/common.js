@@ -19,7 +19,7 @@ export const getBaseUrl = () => {
   if(process.env.NODE_ENV === 'development') {
     url = 'http://localhost:1337/api'
   } else if(process.env.NODE_ENV === 'production') {
-    url = 'http://vendor-wise/api'
+    url = 'http://localhost:1337/api'
   }
   return url;
 }

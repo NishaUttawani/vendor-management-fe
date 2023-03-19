@@ -19,7 +19,6 @@ function NavBar() {
   }
   return (
     <>
-      {/* {JSON.stringify(auth)} */}
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Container>
           <Navbar.Brand as={NavLink} to="/">VendorWise</Navbar.Brand>
