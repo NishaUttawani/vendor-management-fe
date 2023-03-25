@@ -110,13 +110,15 @@ export default function Workers() {
     try {
       //get Worker Contracts
       const response = await _getWorkerContracts(`filters[workerId]=${id}`);
-
-      //delete worker contract
-      const serviceContractId = response.data.data[0].id;
-      await _deleteWorkerContract(serviceContractId);
+      if(response.data?.data?.length > 0) {
+        //delete worker contract
+        const serviceContractId = response.data.data[0].id;
+        await _deleteWorkerContract(serviceContractId);
+      }
 
       //delete worker
       await _deleteWorker(id);
+
       setWorkers(workers => workers.filter(item => item.id !== id));
       setRefreshKey(key => key); //TODO: implement success toast
     } catch(err) {

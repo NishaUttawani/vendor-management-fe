@@ -115,19 +115,22 @@ export default function Contracts() {
     try {
       //get workerContract
       const response = await _getWorkerContracts(id);
-      const serviceContractId = response.data.data[0].id;
-      const workerId = response.data.data[0].attributes.workerId.data.id;
-      
-      //delete workerContract
-      await _deleteWorkerContract(serviceContractId);
 
-      //update worker
-      const payload = {
-        data: {
-          allocation: false
+      if(response.data?.data?.length > 0) {
+        const serviceContractId = response.data.data[0].id;
+        const workerId = response.data.data[0].attributes.workerId.data.id;
+      
+        //delete workerContract
+        await _deleteWorkerContract(serviceContractId);
+
+        //update worker
+        const payload = {
+          data: {
+            allocation: false
+          }
         }
+        await _updateWorker(workerId, payload)
       }
-      await _updateWorker(workerId, payload)
 
       //delete contract
       await _deleteContract(id);
@@ -136,7 +139,7 @@ export default function Contracts() {
       setRefreshKey(key => key +1); //TODO: Implement success toast
     } catch(err) {
       console.log({
-        message: 'delete contact failed'
+        message: 'delete contract failed'
       })
     }
   }
