@@ -9,7 +9,6 @@ import { AuthProvider } from './shared/authContext';
 import { PrivateRoute } from './shared/privateRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 import NavBar from './components/NavBar';
-import Test from './pages/Test';
 
 const Login = React.lazy(() => import('./pages/Login'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
