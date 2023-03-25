@@ -9,10 +9,11 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import cellEditFactory, { Type } from 'react-bootstrap-table2-editor';
 
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { getBaseUrl, getToken } from '../shared/common';
 import { useAuth } from '../shared/authContext';
+import { _addContract, _deleteContract, _getContracts, _updateContract } from '../shared/api/contractApi';
+import { _updateWorker } from '../shared/api/workerApi';
+import { _deleteWorkerContract, _getWorkerContracts } from '../shared/api/workerContractApi';
 
 export default function Contracts() {
   const deleteButton = (cell, row, rowIndex, formatExtraData) => {
@@ -72,105 +73,90 @@ export default function Contracts() {
 
   const auth = useAuth();
 
-  const getContracts = () => {
-    axios.get(`${getBaseUrl()}/service-contracts?filters[ownerId][id]=${auth.user?.id}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    })
-      .then(response => setContracts(response.data.data.map(item => {
+  const getContracts = async() => {
+    try {
+      const response = await _getContracts(`filters[ownerId][id]=${auth.user?.id}`);
+      setContracts(response.data.data.map(item => {
         return {
           ...item.attributes,
           id: item.id,
         }
-      })))
-      .catch(err => console.log(err))
+      }));
+    } catch (err) {
+      console.log({
+        message: 'get contracts failed !!',
+        err
+      })
+    }
   }
 
-  const addContract = (e) => {
+  const addContract = async (e) => {
     e.preventDefault();
-    axios.post(`${getBaseUrl()}/service-contracts`,
-      {
-        data: {
-          name: contract.name,
-          status: contract.status.value,
-          contractId: uuidv4(),
-          ownerId: auth.user.id,
-        }
-      },
-      {
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-      })
-      .then(response => {
-        setContractData(initialState);
-        setValidated();
-        setErrorCode();
-        setRefreshKey(key => key +1);
-      })
-      .catch(err => {
-        setErrorCode(err.response.status);
-      });
-
+    const payload = {
+      data: {
+        name: contract.name,
+        status: contract.status.value,
+        contractId: uuidv4(),
+        ownerId: auth.user.id,
+      }
+    }
+    try {
+      await _addContract(payload);
+      setContractData(initialState);
+      setValidated();
+      setErrorCode();
+      setRefreshKey(key => key +1);
+    } catch(err) {
+      setErrorCode(err.response.status);
+    }
   }
 
-  const deleteContract = (id) => {
-    axios.all([
+  const deleteContract = async (id) => {
+    try {
+      //get workerContract
+      const response = await _getWorkerContracts(id);
+      const serviceContractId = response.data.data[0].id;
+      const workerId = response.data.data[0].attributes.workerId.data.id;
+      
       //delete workerContract
-      deleteWorkerContract(id),
+      await _deleteWorkerContract(serviceContractId);
+
+      //update worker
+      const payload = {
+        data: {
+          allocation: false
+        }
+      }
+      await _updateWorker(workerId, payload)
 
       //delete contract
-      axios.delete(`${getBaseUrl()}/service-contracts/${id}`,{
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-      })
-    ]
-    ).then(response => {
+      await _deleteContract(id);
+
       setContracts(contracts => contracts.filter(item => item.id !== id))
       setRefreshKey(key => key +1); //TODO: Implement success toast
-    }).catch(err => {
-      console.log(err); //TODO: Implement failure tost
-    });
-
+    } catch(err) {
+      console.log({
+        message: 'delete contact failed'
+      })
+    }
   }
 
-  const deleteWorkerContract = (contractId) => {
-    axios.get(`${getBaseUrl()}/worker-service-contracts?populate=*&filters[serviceContractId]=${contractId}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    })
-      .then(response => {
-        if(response.data.data.length > 0) {
-          console.log(response);
-          const serviceContractId = response.data.data[0].id;
-          const workerId = response.data.data[0].attributes.workerId.data.id;
-          axios.all([
-            axios.delete(`${getBaseUrl()}/worker-service-contracts/${serviceContractId}`, {
-              headers: { 'Authorization': `Bearer ${getToken()}` },
-            }),
-            axios.put(`${getBaseUrl()}/app-users/${workerId}`,
-              {
-                data: { allocation: false }
-              },
-              {
-                headers: { 'Authorization': `Bearer ${getToken()}` },
-              })
-          ])
-        }
-      })
-  }
 
-  const updateContractStatus = (id, status) => {
-    axios.put(`${getBaseUrl()}/service-contracts/${id}`,
-      {
-        data: {
-          status
-        }
-      },
-      {
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-      })
-      .then(response => {
-        setRefreshKey(key => key +1);
-      })
-      .catch(err => {
-        console.log(err); // TODO: Implement failure tost
+  const updateContractStatus = async(id, status) => {
+    const payload = {
+      data: {
+        status
+      }
+    }
+    try {
+      await _updateContract(id, payload);
+      setRefreshKey(key => key +1);
+    } catch(err) {
+      console.log({
+        message: 'update contract status failed!!',
+        err
       });
+    }
   }
 
   const handleChange = (e) => {

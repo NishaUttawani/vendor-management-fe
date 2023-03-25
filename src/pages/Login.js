@@ -1,11 +1,12 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { setUserSession, getBaseUrl, getToken } from '../shared/common';
+import { setUserSession } from '../shared/common';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useState } from 'react';
 import { useAuth } from '../shared/authContext';
+import { _getWorkers } from '../shared/api/workerApi';
+import { _login } from '../shared/api/authApi';
 
 export default function Login() {
   const [username, setUserName] = useState();
@@ -19,35 +20,38 @@ export default function Login() {
 
   const auth = useAuth();
 
-  const login = (e) => {
+  const login = async (e) => {
     e.preventDefault();
-    axios.post(`${getBaseUrl()}/auth/local`, {
-      identifier: username,
-      password
-    })
-      .then(response => {
-        setUserSession(response.data.jwt);
-        getOwnerDetails();
-      })
-      .catch(err => {
-        setErrorCode(err.response.status);
-        setPassword('');
+    try {
+      const response = await _login({
+        identifier: username,
+        password
       });
+      setUserSession(response.data.jwt);
+      getOwnerDetails();
+    } catch(err) {
+      console.log('logi failed!!');
+      setErrorCode(err.response.status);
+      setPassword('');
+
+    }
   }
 
-  const getOwnerDetails = () => {
-    axios.get(`${getBaseUrl()}/app-users?filters[username]=${username}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    })
-      .then(response => {
-        const user = {
-          id: response.data.data[0].id,
-          ...response.data.data[0].attributes
-        }
-        auth.login(user);
-        navigate(redirectPath);
+  const getOwnerDetails = async () => {
+    try {
+      const response = await _getWorkers(`filters[username]=${username}`);
+      const user = {
+        id: response.data.data[0].id,
+        ...response.data.data[0].attributes
+      }
+      auth.login(user);
+      navigate(redirectPath);
+    } catch(err) {
+      console.log({
+        message: 'get owner details failed!!',
+        err
       })
-      .catch(err => console.log(err))
+    }
   }
 
   const checkValidity = (e) => {

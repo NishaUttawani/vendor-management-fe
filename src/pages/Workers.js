@@ -8,9 +8,9 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { getBaseUrl, getToken } from '../shared/common';
+import { _addWorker, _deleteWorker, _getWorkers } from '../shared/api/workerApi';
+import { _deleteWorkerContract, _getWorkerContracts } from '../shared/api/workerContractApi';
 
 export default function Workers() {
   const deleteButton = (cell, row, rowIndex, formatExtraData) => {
@@ -68,72 +68,63 @@ export default function Workers() {
   const [refreshKey, setRefreshKey] = useState(0);
 
 
-  const getWorkers = () => {
-    axios.get(`${getBaseUrl()}/app-users?filters[role][$eq]=WORKER`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    })
-      .then(response => setWorkers(response.data.data.map(item => {
+  const getWorkers = async () => {
+    try{
+      const workers = await _getWorkers('filters[role][$eq]=WORKER');
+      setWorkers(workers.data.data.map(item => {
         return {
           ...item.attributes,
           id: item.id,
         }
-      })))
-      .catch(err => console.log(err))
+      }));
+    } catch (err) {
+      console.log({
+        message: 'get workers failed!!',
+        err
+      })
+    }
   }
 
-  const addWorker = (e) => {
+  const addWorker = async (e) => {
     e.preventDefault();
-    axios.post(`${getBaseUrl()}/app-users`,
-      {
-        data: {
-          ...worker,
-          employeeId: uuidv4(),
-          role: 'WORKER'
-        }
-      },
-      {
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-      })
-      .then(response => {
-        setWorkerData(initialState);
-        setValidated();
-        setRefreshKey(key => key +1);
-      })
-      .catch(err => {
-        setErrorCode(err.response.status);
-      });
+    const payload = {
+      data: {
+        ...worker,
+        employeeId: uuidv4(),
+        role: 'WORKER'
+      }
+    };
+    try {
+      await _addWorker(payload);
+      setWorkerData(initialState);
+      setValidated();
+      setErrorCode();
+      setRefreshKey(key => key +1);
 
+    } catch(err) {
+      setErrorCode(err.response.status);
+    }
   }
 
-  const deleteWorker = (id) => {
-    axios.all([
-      //delete workerContract
-      deleteWorkerContract(id),
+  const deleteWorker = async (id) => {
+    try {
+      //get Worker Contracts
+      const response = await _getWorkerContracts(`filters[workerId]=${id}`);
+
+      //delete worker contract
+      const serviceContractId = response.data.data[0].id;
+      await _deleteWorkerContract(serviceContractId);
 
       //delete worker
-      axios.delete(`${getBaseUrl()}/app-users/${id}`,{
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-      })
-    ]
-    ).then(response => {
+      await _deleteWorker(id);
       setWorkers(workers => workers.filter(item => item.id !== id));
       setRefreshKey(key => key); //TODO: implement success toast
-    })
-      .catch(err => {
-        console.log(err); //TODO: Implement failure tost
-      });
-  }
-
-  const deleteWorkerContract = (workerId) => {
-    axios.get(`${getBaseUrl()}/worker-service-contracts?filters[workerId]=${workerId}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    })
-      .then(response => {
-        const serviceContractId = response.data.data[0].id;
-        axios.delete(`${getBaseUrl()}/worker-service-contracts/${serviceContractId}`, {
-          headers: { 'Authorization': `Bearer ${getToken()}` },
-        })
+    } catch(err) {
+      console.log({
+        message: 'error deleting worker!!!',
+        err
       })
+    }
   }
 
   const handleChange = (e) => {
