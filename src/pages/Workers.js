@@ -120,7 +120,7 @@ export default function Workers() {
       await _deleteWorker(id);
 
       setWorkers(workers => workers.filter(item => item.id !== id));
-      setRefreshKey(key => key); //TODO: implement success toast
+      setRefreshKey(key => key + 1); //TODO: implement success toast
     } catch(err) {
       console.log({
         message: 'error deleting worker!!!',
