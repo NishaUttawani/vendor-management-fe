@@ -91,7 +91,7 @@ export default function Contracts() {
       {
         data: {
           name: contract.name,
-          status: typeof contract.status === 'object' ? contract.status.label: contract.status,
+          status: contract.status.value,
           contractId: uuidv4(),
           ownerId: auth.user.id,
         }
@@ -174,7 +174,16 @@ export default function Contracts() {
   }
 
   const handleChange = (e) => {
-    setContractData(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+    if(e.target.name === 'name') {
+      setContractData(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
+    } else {
+      setContractData(prevState => {
+        return {
+          ...prevState,
+          status: {label: e.target.value, value: e.target.value}
+        }
+      })
+    }
   }
 
   const handleCancel = () => {
@@ -226,7 +235,7 @@ export default function Contracts() {
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicStatus">
                 <Form.Label>Status</Form.Label>
-                <Form.Select name="status" value={contract.status} onChange={handleChange}>
+                <Form.Select name="status" value={contract.status.label} onChange={handleChange}>
                   <option>{ContractStatus.draft.label}</option>
                   <option>{ContractStatus.approved.label}</option>
                   <option>{ContractStatus.active.label}</option>
