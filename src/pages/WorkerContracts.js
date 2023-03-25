@@ -188,7 +188,6 @@ export default function WorkerContracts() {
 
   const checkValidity = (e) => {
     const form = e.currentTarget;
-    console.log(workerContract)
     if (form.checkValidity() === false) {
       setValidated(false);
       e.preventDefault();

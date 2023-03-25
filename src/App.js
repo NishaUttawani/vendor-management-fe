@@ -3,6 +3,7 @@ import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import Spinner from 'react-bootstrap/Spinner';
 
 import { AuthProvider } from './shared/authContext';
 import { PrivateRoute } from './shared/privateRoute';
@@ -22,7 +23,7 @@ function App() {
           <NavBar></NavBar>
           <Container className='container'>
             <Row>
-              <React.Suspense fallback={<span>Loading....</span>}>
+              <React.Suspense fallback={<div className='spinner-container'><Spinner animation="grow" /></div>}>
                 <Routes>
                   <Route path="/" element={<PrivateRoute><WorkerContracts /></PrivateRoute>}></Route>
                   <Route path="/login" element={<Login />}></Route>

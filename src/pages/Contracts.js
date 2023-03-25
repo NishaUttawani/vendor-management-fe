@@ -91,7 +91,7 @@ export default function Contracts() {
       {
         data: {
           name: contract.name,
-          status: contract.status.label,
+          status: typeof contract.status === 'object' ? contract.status.label: contract.status,
           contractId: uuidv4(),
           ownerId: auth.user.id,
         }
@@ -112,17 +112,47 @@ export default function Contracts() {
   }
 
   const deleteContract = (id) => {
-    axios.delete(`${getBaseUrl()}/service-contracts/${id}`,
-      {
+    axios.all([
+      //delete workerContract
+      deleteWorkerContract(id),
+
+      //delete contract
+      axios.delete(`${getBaseUrl()}/service-contracts/${id}`,{
         headers: { 'Authorization': `Bearer ${getToken()}` },
       })
+    ]
+    ).then(response => {
+      setContracts(contracts => contracts.filter(item => item.id !== id))
+      setRefreshKey(key => key +1); //TODO: Implement success toast
+    }).catch(err => {
+      console.log(err); //TODO: Implement failure tost
+    });
+
+  }
+
+  const deleteWorkerContract = (contractId) => {
+    axios.get(`${getBaseUrl()}/worker-service-contracts?populate=*&filters[serviceContractId]=${contractId}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
       .then(response => {
-        setContracts(contracts => contracts.filter(item => item.id !== id))
-        setRefreshKey(key => key +1); //TODO: Implement success toast
+        if(response.data.data.length > 0) {
+          console.log(response);
+          const serviceContractId = response.data.data[0].id;
+          const workerId = response.data.data[0].attributes.workerId.data.id;
+          axios.all([
+            axios.delete(`${getBaseUrl()}/worker-service-contracts/${serviceContractId}`, {
+              headers: { 'Authorization': `Bearer ${getToken()}` },
+            }),
+            axios.put(`${getBaseUrl()}/app-users/${workerId}`,
+              {
+                data: { allocation: false }
+              },
+              {
+                headers: { 'Authorization': `Bearer ${getToken()}` },
+              })
+          ])
+        }
       })
-      .catch(err => {
-        console.log(err); //TODO: Implement failure tost
-      });
   }
 
   const updateContractStatus = (id, status) => {

@@ -49,6 +49,10 @@ export default function Workers() {
       text: 'Last Price',
       sort: true,
       filter: textFilter()
+    },{
+      dataField: 'allocation',
+      text: 'Allocated',
+      sort: true,
     }, {
       dataField: 'id',
       text: 'Delete',
@@ -102,18 +106,35 @@ export default function Workers() {
   }
 
   const deleteWorker = (id) => {
-    axios.delete(`${getBaseUrl()}/app-users/${id}`,
-      {
+    axios.all([
+      //delete workerContract
+      deleteWorkerContract(id),
+
+      //delete worker
+      axios.delete(`${getBaseUrl()}/app-users/${id}`,{
         headers: { 'Authorization': `Bearer ${getToken()}` },
       })
-      .then(response => {
-        setWorkers(workers => workers.filter(item => item.id !== id));
-        setRefreshKey(key => key); //TODO: implement success toast
-      })
+    ]
+    ).then(response => {
+      setWorkers(workers => workers.filter(item => item.id !== id));
+      setRefreshKey(key => key); //TODO: implement success toast
+    })
       .catch(err => {
         console.log(err); //TODO: Implement failure tost
       });
-  } 
+  }
+
+  const deleteWorkerContract = (workerId) => {
+    axios.get(`${getBaseUrl()}/worker-service-contracts?filters[workerId]=${workerId}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+      .then(response => {
+        const serviceContractId = response.data.data[0].id;
+        axios.delete(`${getBaseUrl()}/worker-service-contracts/${serviceContractId}`, {
+          headers: { 'Authorization': `Bearer ${getToken()}` },
+        })
+      })
+  }
 
   const handleChange = (e) => {
     setWorkerData(prevState => ({ ...prevState, [e.target.name]: e.target.value }));

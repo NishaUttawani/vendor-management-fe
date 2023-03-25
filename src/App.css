@@ -10,6 +10,15 @@
   margin: 20px;
 }
 
+.spinner-container {
+  position: absolute;
+  top:100px;
+  bottom: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .worker-card {
   margin-bottom: 20px;
 }
