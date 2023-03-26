@@ -48,9 +48,9 @@ describe('Login component', () => {
   it('disables the submit button initially', () => {
     render(<Login />);
 
-    const submitButton = screen.getByText('Submit');
-    expect(submitButton).toBeInTheDocument();
-    expect(submitButton).toBeDisabled();
+    const loginButton = screen.getByText('Login');
+    expect(loginButton).toBeInTheDocument();
+    expect(loginButton).toBeDisabled();
   });
 
   it('enables the submit button after both email and password fields are filled', () => {
@@ -58,12 +58,12 @@ describe('Login component', () => {
 
     const emailInput = screen.getByLabelText('Email address');
     const passwordInput = screen.getByLabelText('Password');
-    const submitButton = screen.getByText('Submit');
+    const loginButton = screen.getByText('Login');
 
     fireEvent.change(emailInput, { target: { value: 'test@test.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password' } });
 
-    expect(submitButton).not.toBeDisabled();
+    expect(loginButton).not.toBeDisabled();
   });
 
   it('calls _login and setUserSession when the form is submitted with valid credentials', async () => {
@@ -94,12 +94,12 @@ describe('Login component', () => {
 
     const emailInput = screen.getByLabelText('Email address');
     const passwordInput = screen.getByLabelText('Password');
-    const submitButton = screen.getByText('Submit');
+    const loginButton = screen.getByText('Login');
 
     fireEvent.change(emailInput, { target: { value: 'test@test.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password' } });
 
-    fireEvent.click(submitButton);
+    fireEvent.click(loginButton);
 
     await waitFor(() => {
       expect(_login).toHaveBeenCalledWith({
@@ -125,11 +125,11 @@ describe('Login component', () => {
     await act(async () => {
       const emailInput = screen.getByLabelText('Email address');
       const passwordInput = screen.getByLabelText('Password');
-      const submitButton = screen.getByText('Submit');
+      const loginButton = screen.getByText('Login');
   
       fireEvent.change(emailInput, { target: { value: 'test@test.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password' } });
-      fireEvent.click(submitButton);
+      fireEvent.click(loginButton);
     });
 
     await waitFor(() => {
@@ -157,11 +157,11 @@ describe('Login component', () => {
     await act(async () => {
       const emailInput = screen.getByLabelText('Email address');
       const passwordInput = screen.getByLabelText('Password');
-      const submitButton = screen.getByText('Submit');
+      const loginButton = screen.getByText('Login');
   
       fireEvent.change(emailInput, { target: { value: 'test@test.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password' } });
-      fireEvent.click(submitButton);
+      fireEvent.click(loginButton);
     });
 
     await waitFor(() => {

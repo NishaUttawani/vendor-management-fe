@@ -90,7 +90,7 @@ export default function Login() {
           <Form.Control required type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Form.Group>
         <Button className="" variant="dark" disabled={!validated} type="submit">
-          Submit
+          Login
         </Button>
       </Form>
       {errorCode && errorCode === 400 &&
