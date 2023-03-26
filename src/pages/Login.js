@@ -29,7 +29,7 @@ export default function Login() {
         password
       });
       setUserSession(response?.data?.jwt);
-      getOwnerDetails();
+      await getOwnerDetails();
     } catch(err) {
       console.log({
         message: 'login failed!!',
@@ -67,7 +67,6 @@ export default function Login() {
       setValidated(true);
     }
   }
-
 
   return (
     <>

@@ -6,8 +6,23 @@ const axiosClient = axios.create({
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${getToken()}`
   }
 });
+
+
+axiosClient.interceptors.request.use(
+  (config) => {
+    // Get the token from storage
+    const token = getToken();
+    if (token) {
+      // Update the headers with the new token
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default axiosClient;
