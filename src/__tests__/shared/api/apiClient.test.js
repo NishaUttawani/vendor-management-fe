@@ -7,7 +7,6 @@ describe('apiClient', () => {
   });
 
   test('headers are set correctly', () => {
-    console.log(axiosClient.defaults.headers)
     expect(axiosClient.defaults.headers.Accept).toEqual('application/json');
     expect(axiosClient.defaults.headers['Content-Type']).toEqual('application/json');
   });

@@ -22,7 +22,7 @@
     "lint": "eslint \"src/**/*.{js,jsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx}\" --fix",
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!my-library-dir)/'",
-    "test:coverage": "react-scripts test --env=jsdom --watchAll=false --coverage",
+    "test:coverage": "react-scripts test --env=jsdom --watchAll=false --coverage --transformIgnorePatterns 'node_modules/(?!my-library-dir)/'",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
