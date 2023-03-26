@@ -66,7 +66,7 @@ export default function WorkerContracts() {
   const getWokerContracts = async () => {
     try {
       const response = await _getWorkerContracts(true)
-      setWorkerContracts(response.data.data.map(item => {
+      setWorkerContracts(response?.data?.data?.map(item => {
         return {
           username: item.attributes.workerId.data?.attributes?.username,
           workerId: item.attributes.workerId.data?.id,
@@ -263,20 +263,7 @@ export default function WorkerContracts() {
           <h6>List of Worker Contract</h6>
         </Col>
       </Row>
-      <BootstrapTable keyField='employeeId' data={workerContracts} columns={columns} filter={filterFactory()} />
+      <BootstrapTable keyField='id' data={workerContracts} columns={columns} filter={filterFactory()} />
     </>
   )
 }
-
-
-
-/**
- * TODO
- * 1. Duplicate Contracts should not be allowed to add again - DONE
- * 2. Edit Contract status - DONE
- * 3. Error Boundary - DONE
- * 4. Route Gaurd - DONE
- * 5. Logout - DONE
- * 6. Delete cascade COntract relation on deletion of contract and worker -> strapi
- * 7. Form validation for react select
- */

@@ -46,7 +46,7 @@ export default function Workers() {
 
     }, {
       dataField: 'lastName',
-      text: 'Last Price',
+      text: 'Last Name',
       sort: true,
       filter: textFilter()
     },{
@@ -55,7 +55,7 @@ export default function Workers() {
       sort: true,
     }, {
       dataField: 'id',
-      text: 'Delete',
+      text: 'Delete Worker',
       formatter: deleteButton,
     }
   ];
@@ -215,7 +215,7 @@ export default function Workers() {
               <p className='error'>Please check your data it seems to be duplicate</p>
             }
             {errorCode && errorCode !== 400 &&
-              <p className='error'>Something went wrong!!. Please try again. </p>
+              <p className='error'>Something went wrong!! Please try again. </p>
             }
           </Card.Body>
         </Card>}
@@ -225,7 +225,7 @@ export default function Workers() {
           <h6>List of Workers</h6>
         </Col>
       </Row>
-      <BootstrapTable keyField='employeeId' data={workers} columns={columns} filter={filterFactory()} />
+      <BootstrapTable keyField='id' data={workers} columns={columns} filter={filterFactory()} />
     </>
   )
 }

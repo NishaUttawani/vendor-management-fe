@@ -1,45 +1,43 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { AuthProvider } from '../../shared/authContext';
 import NavBar from '../../components/NavBar';
-import { removeUserSession } from '../../shared/common';
 
 jest.mock('../../shared/common', () => ({
-  removeUserSession: jest.fn()
+  removeUserSession: jest.fn(),
+}));
+const mockLogout = jest.fn();
+const mockNavigate = jest.fn();
+jest.mock('../../shared/authContext', () => ({
+  useAuth: () => ({
+    user: 'user',
+    logout: mockLogout,
+  }),
+}));
+
+jest.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
 }));
 
 describe('NavBar component', () => {
   it('renders the brand name', () => {
-    render(
-      <AuthProvider>
-        <MemoryRouter>
-          <NavBar />
-        </MemoryRouter>
-      </AuthProvider>
-    );
+    render(<NavBar />);
     const brandElement = screen.getByText('VendorWise');
     expect(brandElement).toBeInTheDocument();
   });
 
-  // it('should render correctly with logged in user', () => {
-  //   const user = { username: 'testuser' };
-  //   const logoutMock = jest.fn();
-  //   render(
-  //     <AuthProvider value={{ user, logout: logoutMock }}>
-  //       <MemoryRouter>
-  //         <NavBar />
-  //       </MemoryRouter>
-  //     </AuthProvider>
-  //   );
+  it('should render correctly with logged in user', () => {
 
-  //   expect(screen.getByText('VendorWise')).toBeInTheDocument();
-  //   expect(screen.getByText('Workers')).toBeInTheDocument();
-  //   expect(screen.getByText('Contracts')).toBeInTheDocument();
-  //   expect(screen.getByText('Logout')).toBeInTheDocument();
+    render(
+      <NavBar />
+    );
 
-  //   fireEvent.click(screen.getByText('Logout'));
+    expect(screen.getByText('VendorWise')).toBeInTheDocument();
+    expect(screen.getByText('Workers')).toBeInTheDocument();
+    expect(screen.getByText('Contracts')).toBeInTheDocument();
+    expect(screen.getByText('Logout')).toBeInTheDocument();
 
-  //   expect(logoutMock).toHaveBeenCalledTimes(1);
-  // });
+    fireEvent.click(screen.getByText('Logout'));
+
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+  });
 });

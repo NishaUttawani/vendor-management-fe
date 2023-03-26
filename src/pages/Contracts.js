@@ -59,7 +59,7 @@ export default function Contracts() {
     },
   }, {
     dataField: 'id',
-    text: 'Delete',
+    text: 'Delete Contract',
     formatter: deleteButton,
     editable: false
   }];
@@ -246,7 +246,7 @@ export default function Contracts() {
               <p className='error'>Please check your data it seems to be duplicate</p>
             }
             {errorCode && errorCode !== 400 &&
-              <p className='error'>Something went wrong!!. Please try again. </p>
+              <p className='error'>Something went wrong!! Please try again. </p>
             }
           </Card.Body>
         </Card>}

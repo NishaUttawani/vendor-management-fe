@@ -1,17 +1,18 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { setUserSession } from '../shared/common';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+
+import { setUserSession } from '../shared/common';
 import { useAuth } from '../shared/authContext';
 import { _getWorkers } from '../shared/api/workerApi';
 import { _login } from '../shared/api/authApi';
 
 export default function Login() {
-  const [username, setUserName] = useState();
-  const [password, setPassword] = useState();
-  const [errorCode, setErrorCode] = useState();
+  const [username, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorCode, setErrorCode] = useState(null);
   const [validated, setValidated] = useState(false);
 
   const navigate = useNavigate();
@@ -27,13 +28,15 @@ export default function Login() {
         identifier: username,
         password
       });
-      setUserSession(response.data.jwt);
+      setUserSession(response?.data?.jwt);
       getOwnerDetails();
     } catch(err) {
-      console.log('logi failed!!');
+      console.log({
+        message: 'login failed!!',
+        err
+      });
       setErrorCode(err.response.status);
       setPassword('');
-
     }
   }
 
@@ -41,8 +44,8 @@ export default function Login() {
     try {
       const response = await _getWorkers(`filters[username]=${username}`);
       const user = {
-        id: response.data.data[0].id,
-        ...response.data.data[0].attributes
+        id: response?.data?.data[0]?.id,
+        ...response?.data?.data[0]?.attributes
       }
       auth.login(user);
       navigate(redirectPath);
