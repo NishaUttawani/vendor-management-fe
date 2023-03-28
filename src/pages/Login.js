@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 
 import { setUserSession } from '../shared/common';
@@ -98,6 +98,7 @@ export default function Login() {
       {errorCode && errorCode !== 400 &&
         <p className='error'>Something went wrong!!. Please try again. </p>
       }
+      <span>Do not have an account? <Link to="/register">Register</Link></span>
     </>
   );
 }

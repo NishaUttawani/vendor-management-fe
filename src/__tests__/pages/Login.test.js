@@ -30,7 +30,8 @@ jest.mock('../../shared/api/authApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
-  useLocation: () => mockLocation
+  useLocation: () => mockLocation,
+  Link: jest.fn(({ children, to }) => <a href={to}>{children}</a>),
 }));
 
 describe('Login component', () => {

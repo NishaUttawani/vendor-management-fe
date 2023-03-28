@@ -10,6 +10,7 @@ import { PrivateRoute } from './shared/privateRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 import NavBar from './components/NavBar';
 import { removeUserSession } from './shared/common';
+import Register from './pages/Register';
 
 const Login = React.lazy(() => import('./pages/Login'));
 const Contracts = React.lazy(() => import('./pages/Contracts'));
@@ -30,8 +31,9 @@ function App() {
             <Row>
               <React.Suspense fallback={<div className='spinner-container'><Spinner animation="grow" /></div>}>
                 <Routes>
-                  <Route path="/wokercontracts" element={<PrivateRoute><WorkerContracts /></PrivateRoute>}></Route>
                   <Route path="/login" element={<Login />}></Route>
+                  <Route path="/register" element={<Register />}></Route>
+                  <Route path="/wokercontracts" element={<PrivateRoute><WorkerContracts /></PrivateRoute>}></Route>
                   <Route path="/workers" element={<PrivateRoute><Workers /></PrivateRoute>}></Route>
                   <Route path="/contracts" element={<PrivateRoute><Contracts /></PrivateRoute>}></Route>
                   <Route path="/" element={<Navigate to="/wokercontracts" />} />
