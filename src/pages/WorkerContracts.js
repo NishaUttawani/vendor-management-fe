@@ -65,7 +65,7 @@ export default function WorkerContracts() {
 
   const getWokerContracts = async () => {
     try {
-      const response = await _getWorkerContracts(true)
+      const response = await _getWorkerContracts(true, `filters[serviceContractId][ownerId]=${auth.user?.id}`)
       setWorkerContracts(response?.data?.data?.map(item => {
         return {
           username: item.attributes.workerId.data?.attributes?.username,

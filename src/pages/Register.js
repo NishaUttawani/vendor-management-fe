@@ -26,7 +26,6 @@ export default function Register() {
 
 
   const register = async (e) => {
-    console.log('called bkagdgaigdagg')
     e.preventDefault();
     const registerPayload = {
       username: userData.username,
